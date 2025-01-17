@@ -3,6 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 /**
  * -------------- ROUTES ----------------
  */
@@ -27,17 +31,6 @@ app.use((err, req, res, next) => {
 /**
  * -------------- SERVER ----------------
  */
-// Gracefully shutdown server and disconnect from Prisma
-process.on("SIGINT", async () => {
-  console.log("Server is shutting down...");
-  await prisma.$disconnect(); // Disconnect Prisma Client
-  process.exit(0); // Exit the process
-});
-process.on("SIGTERM", async () => {
-  console.log("Server is shutting down...");
-  await prisma.$disconnect(); // Disconnect Prisma Client
-  process.exit(0); // Exit the process
-});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
