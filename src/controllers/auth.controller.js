@@ -1,6 +1,8 @@
+// controller/auth.controller.js
 const {
   CognitoIdentityProviderClient,
   SignUpCommand,
+  InitiateAuthCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
 const crypto = require("crypto");
 require("dotenv").config();
@@ -19,7 +21,9 @@ const calculateSecretHash = (username, clientId, clientSecret) => {
   return hmac.digest("base64");
 };
 
-// ***************** Signup Function *****************
+/**
+ * -------------- signup ----------------
+ */
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -58,7 +62,52 @@ const signup = async (req, res) => {
   }
 };
 
-// Export functions
+/**
+ * -------------- LOGIN ----------------
+ */
+const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Calculate the secret hash
+    const secretHash = calculateSecretHash(username, ClientId, ClientSecret);
+
+    // Initiate Auth command
+    const command = new InitiateAuthCommand({
+      AuthFlow: "USER_PASSWORD_AUTH", // Authentication flow for username/password
+      ClientId,
+      AuthParameters: {
+        USERNAME: username,
+        PASSWORD: password,
+        SECRET_HASH: secretHash, // Ensure this matches the calculated hash
+      },
+    });
+
+    // Send the login request to Cognito
+    const data = await cognitoClient.send(command);
+
+    res.status(200).json({
+      message: "Login successful.",
+      tokens: {
+        idToken: data.AuthenticationResult.IdToken,
+        accessToken: data.AuthenticationResult.AccessToken,
+        refreshToken: data.AuthenticationResult.RefreshToken,
+      },
+    });
+  } catch (error) {
+    console.error("Error during Cognito login:", error);
+    res
+      .status(401)
+      .json({ error: error.message || "Invalid username or password." });
+  }
+};
+
 module.exports = {
   signup,
+  login,
 };
