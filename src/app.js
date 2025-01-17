@@ -1,32 +1,20 @@
 // app.js
 require("dotenv").config();
-
 const express = require("express");
 const app = express();
-
-const signUpRouter = require("./routes/signUpRouter");
-const indexRouter = require("./routes/indexRouter");
-const loginRouter = require("./routes/loginRouter");
-const uploadRouter = require("./routes/uploadRouter");
 
 /**
  * -------------- ROUTES ----------------
  */
-app.use("/", indexRouter);
+const authRoutes = require("./routes/auth.routes");
+const postsRoutes = require("./routes/posts.routes");
+const commentsRoutes = require("./routes/comments.routes");
+const usersRoutes = require("./routes/users.routes");
 
-app.use("/sign-up", signUpRouter);
-app.use("/upload", uploadRouter);
-
-app.use("/login", loginRouter);
-app.post("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).send("Logout failed");
-    }
-
-    res.redirect("/");
-  });
-});
+app.use("/auth", authRoutes);
+app.use("/posts", postsRoutes);
+app.use("/comments", commentsRoutes);
+app.use("/users", usersRoutes);
 
 /**
  * -------------- Error handling middleware ----------------
