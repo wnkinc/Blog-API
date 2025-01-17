@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/wnkinc/Blog-API#readme",
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.730.0",
     "@prisma/client": "^6.2.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
