@@ -3,33 +3,11 @@ require("dotenv").config();
 
 const express = require("express");
 const app = express();
-const path = require("path");
 
 const signUpRouter = require("./routes/signUpRouter");
 const indexRouter = require("./routes/indexRouter");
 const loginRouter = require("./routes/loginRouter");
 const uploadRouter = require("./routes/uploadRouter");
-
-var passport = require("passport");
-
-app.use(express.static(path.join(__dirname, "public")));
-
-app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
-
-/**
- * -------------- PASSPORT AUTHENTICATION ----------------
- */
-require("./config/passport");
-
-// app.use(passport.initialize()); //not required
-app.use(passport.session());
-
-app.use((req, res, next) => {
-  console.log(req.session);
-  console.log(req.user);
-  next();
-});
 
 /**
  * -------------- ROUTES ----------------
