@@ -61,6 +61,53 @@ const getCommentsByPostId = async (req, res) => {
   }
 };
 
+/**
+ * -------------- POST comment ----------------
+ */
+const addComment = async (req, res) => {
+  const { content, postId, parentId, userId } = req.body;
+
+  try {
+    if (!content || !postId || !userId) {
+      return res
+        .status(400)
+        .json({ error: "Content, postId, and userId are required." });
+    }
+
+    // Ensure parentId exists if provided (for replies)
+    if (parentId) {
+      const parentComment = await prisma.comment.findUnique({
+        where: { id: parentId },
+      });
+      if (!parentComment) {
+        return res
+          .status(400)
+          .json({ error: "Parent comment does not exist." });
+      }
+    }
+
+    // Create the comment
+    const newComment = await prisma.comment.create({
+      data: {
+        content,
+        postId: parseInt(postId, 10),
+        parentId: parentId ? parseInt(parentId, 10) : null,
+        userId: parseInt(userId, 10),
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Comment added successfully.", comment: newComment });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding the comment." });
+  }
+};
+
 module.exports = {
   getCommentsByPostId,
+  addComment,
 };
