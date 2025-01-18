@@ -133,8 +133,73 @@ const createPost = async (req, res) => {
   }
 };
 
+// Update a post
+const updatePost = async (req, res) => {
+  const { id } = req.params;
+  const { title, slug, content, published } = req.body;
+
+  try {
+    // Find the existing post
+    const existingPost = await prisma.post.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!existingPost) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    // Determine final slug
+    let finalSlug = slug || existingPost.slug;
+    if (title && !slug) {
+      finalSlug = slugify(title, { lower: true, strict: true });
+
+      // Ensure the slug is unique
+      let slugExists = await prisma.post.findUnique({
+        where: { slug: finalSlug },
+      });
+      let counter = 1;
+      while (slugExists) {
+        finalSlug = `${slugify(title, {
+          lower: true,
+          strict: true,
+        })}-${counter}`;
+        slugExists = await prisma.post.findUnique({
+          where: { slug: finalSlug },
+        });
+        counter++;
+      }
+    }
+
+    // Update the post
+    const updatedPost = await prisma.post.update({
+      where: { id: parseInt(id, 10) },
+      data: {
+        title: title || existingPost.title,
+        slug: finalSlug,
+        content: content || existingPost.content,
+        published: published !== undefined ? published : existingPost.published,
+      },
+    });
+
+    res
+      .status(200)
+      .json({ message: "Post updated successfully.", post: updatedPost });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    if (error.code === "P2002") {
+      return res
+        .status(409)
+        .json({ error: "A post with this slug already exists." });
+    }
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the post." });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getPostBySlug,
   createPost,
+  updatePost,
 };
