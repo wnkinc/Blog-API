@@ -107,7 +107,36 @@ const addComment = async (req, res) => {
   }
 };
 
+/**
+ * -------------- DELETE comment ----------------
+ */
+const deleteComment = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Check if the comment exists
+    const existingComment = await prisma.comment.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!existingComment) {
+      return res.status(404).json({ error: "Comment not found." });
+    }
+
+    // Delete the comment
+    await prisma.comment.delete({ where: { id: parseInt(id, 10) } });
+
+    res.status(200).json({ message: "Comment deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the comment." });
+  }
+};
+
 module.exports = {
   getCommentsByPostId,
   addComment,
+  deleteComment,
 };

@@ -37,14 +37,14 @@ const seedMockPosts = async () => {
           slug: "first-post",
           content: "This is the content of the first post.",
           published: true,
-          authorId: 5, // Assuming the author ID exists in the database
+          authorId: 1, // Assuming the author ID exists in the database
         },
         {
           title: "Second Post",
           slug: "second-post",
           content: "This is the content of the second post.",
           published: false,
-          authorId: 6, // Assuming the author ID exists in the database
+          authorId: 2, // Assuming the author ID exists in the database
         },
       ],
       skipDuplicates: true, // Prevent duplicates if script is run multiple times
@@ -63,8 +63,8 @@ const seedMockComments = async () => {
     const firstComment = await prisma.comment.create({
       data: {
         content: "This is the first comment on the first post.",
-        postId: 5, // Assuming the post ID exists
-        userId: 5, // Assuming the user ID exists
+        postId: 3, // Assuming the post ID exists
+        userId: 1, // Assuming the user ID exists
       },
     });
 
@@ -72,9 +72,9 @@ const seedMockComments = async () => {
     await prisma.comment.create({
       data: {
         content: "This is a reply to the first comment.",
-        postId: 5, // Same post as the parent comment
+        postId: 3, // Same post as the parent comment
         parentId: firstComment.id, // Reference the first comment
-        userId: 6, // Assuming the user ID exists
+        userId: 2, // Assuming the user ID exists
       },
     });
 
@@ -82,8 +82,8 @@ const seedMockComments = async () => {
     await prisma.comment.create({
       data: {
         content: "This is another top-level comment on the second post.",
-        postId: 6, // Assuming the post ID exists
-        userId: 5, // Assuming the user ID exists
+        postId: 4, // Assuming the post ID exists
+        userId: 1, // Assuming the user ID exists
       },
     });
 
