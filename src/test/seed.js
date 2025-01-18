@@ -56,9 +56,48 @@ const seedMockPosts = async () => {
   }
 };
 
+// Seed mock comments into the database
+const seedMockComments = async () => {
+  try {
+    // Create a top-level comment
+    const firstComment = await prisma.comment.create({
+      data: {
+        content: "This is the first comment on the first post.",
+        postId: 5, // Assuming the post ID exists
+        userId: 5, // Assuming the user ID exists
+      },
+    });
+
+    // Create a reply to the first comment
+    await prisma.comment.create({
+      data: {
+        content: "This is a reply to the first comment.",
+        postId: 5, // Same post as the parent comment
+        parentId: firstComment.id, // Reference the first comment
+        userId: 6, // Assuming the user ID exists
+      },
+    });
+
+    // Create another top-level comment
+    await prisma.comment.create({
+      data: {
+        content: "This is another top-level comment on the second post.",
+        postId: 6, // Assuming the post ID exists
+        userId: 5, // Assuming the user ID exists
+      },
+    });
+
+    console.log("Mock comments seeded successfully.");
+  } catch (error) {
+    console.error("Error seeding mock comments:", error);
+    throw new Error("Failed to seed mock comments.");
+  }
+};
+
 const main = async () => {
   // await seedMockUsers();
-  await seedMockPosts();
+  // await seedMockPosts();
+  await seedMockComments();
 };
 
 main()
@@ -73,4 +112,5 @@ main()
 module.exports = {
   seedMockUsers,
   seedMockPosts,
+  seedMockComments,
 };
