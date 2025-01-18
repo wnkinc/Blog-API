@@ -1,6 +1,6 @@
 // controller/auth.controller.js
-const crypto = require("crypto");
 require("dotenv").config();
+const crypto = require("crypto");
 
 const {
   CognitoIdentityProviderClient,
@@ -9,11 +9,11 @@ const {
   GlobalSignOutCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
 
+const ClientId = process.env.COGNITO_APP_CLIENT_ID;
+const ClientSecret = process.env.COGNITO_APP_CLIENT_SECRET;
 const cognitoClient = new CognitoIdentityProviderClient({
   region: process.env.AWS_REGION,
 });
-const ClientId = process.env.COGNITO_APP_CLIENT_ID;
-const ClientSecret = process.env.COGNITO_APP_CLIENT_SECRET;
 
 const calculateSecretHash = (username, clientId, clientSecret) => {
   const hmac = crypto.createHmac("SHA256", clientSecret);
