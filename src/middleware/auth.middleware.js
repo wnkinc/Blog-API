@@ -26,10 +26,8 @@ const verifyToken = async (req, res, next) => {
   }
 
   try {
-    // Fetch JWKS
     const jwks = await fetchJWKS();
 
-    // Decode token header
     const decodedHeader = jwt.decode(token, { complete: true });
     const kid = decodedHeader?.header?.kid;
 
@@ -37,13 +35,11 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ error: "Invalid token." });
     }
 
-    // Find the JWK that matches the token's kid
     const jwk = jwks.find((key) => key.kid === kid);
     if (!jwk) {
       return res.status(401).json({ error: "Invalid token signature." });
     }
 
-    // Convert JWK to PEM
     const pem = jwkToPem(jwk);
 
     // Verify token
