@@ -1,4 +1,4 @@
-// auth.middleware.js
+// middleware/auth.middleware.js
 const jwt = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
 const axios = require("axios");
