@@ -44,6 +44,42 @@ const getAllPosts = async (req, res) => {
   }
 };
 
+// Fetch a single post by slug
+const getPostBySlug = async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    // Find the post by slug
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        author: {
+          select: { id: true, username: true },
+        },
+        comments: {
+          include: {
+            user: {
+              select: { id: true, username: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    res.status(200).json({ post });
+  } catch (error) {
+    console.error("Error fetching post by slug:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the post." });
+  }
+};
+
 module.exports = {
   getAllPosts,
+  getPostBySlug,
 };
