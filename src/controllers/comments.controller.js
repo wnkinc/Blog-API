@@ -114,7 +114,6 @@ const deleteComment = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Check if the comment exists
     const existingComment = await prisma.comment.findUnique({
       where: { id: parseInt(id, 10) },
     });
@@ -123,7 +122,6 @@ const deleteComment = async (req, res) => {
       return res.status(404).json({ error: "Comment not found." });
     }
 
-    // Delete the comment
     await prisma.comment.delete({ where: { id: parseInt(id, 10) } });
 
     res.status(200).json({ message: "Comment deleted successfully." });
@@ -135,8 +133,48 @@ const deleteComment = async (req, res) => {
   }
 };
 
+/**
+ * -------------- UPDATE comment ----------------
+ */
+const updateComment = async (req, res) => {
+  const { id } = req.params;
+  const { content } = req.body;
+
+  try {
+    if (!content) {
+      return res.status(400).json({ error: "Content is required." });
+    }
+
+    // Check if the comment exists
+    const existingComment = await prisma.comment.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!existingComment) {
+      return res.status(404).json({ error: "Comment not found." });
+    }
+
+    // Update the comment
+    const updatedComment = await prisma.comment.update({
+      where: { id: parseInt(id, 10) },
+      data: { content },
+    });
+
+    res.status(200).json({
+      message: "Comment updated successfully.",
+      comment: updatedComment,
+    });
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the comment." });
+  }
+};
+
 module.exports = {
   getCommentsByPostId,
   addComment,
   deleteComment,
+  updateComment,
 };
