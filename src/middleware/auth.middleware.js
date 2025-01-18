@@ -17,7 +17,6 @@ const fetchJWKS = async () => {
   return jwksPromise;
 };
 
-// Middleware to verify token
 const verifyToken = async (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
@@ -48,7 +47,6 @@ const verifyToken = async (req, res, next) => {
         return res.status(401).json({ error: "Invalid token." });
       }
 
-      // Attach decoded token payload to req.user
       req.user = decoded;
       next();
     });
