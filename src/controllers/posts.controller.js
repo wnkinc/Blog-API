@@ -1,5 +1,6 @@
 // controllers/posts.controller.js
 const prisma = require("../prisma");
+const slugify = require("slugify");
 
 // Fetch all posts with pagination
 const getAllPosts = async (req, res) => {
@@ -79,7 +80,61 @@ const getPostBySlug = async (req, res) => {
   }
 };
 
+// Create a new post
+const createPost = async (req, res) => {
+  const { title, slug, content, published, authorId } = req.body;
+
+  try {
+    // Validate required fields
+    if (!title || !content || !authorId) {
+      return res
+        .status(400)
+        .json({ error: "Title, content, and authorId are required." });
+    }
+
+    // Generate slug if not provided
+    let finalSlug = slug || slugify(title, { lower: true, strict: true });
+
+    // Ensure slug is unique
+    let slugExists = await prisma.post.findUnique({
+      where: { slug: finalSlug },
+    });
+    let counter = 1;
+    while (slugExists) {
+      finalSlug = `${slugify(title, { lower: true, strict: true })}-${counter}`;
+      slugExists = await prisma.post.findUnique({ where: { slug: finalSlug } });
+      counter++;
+    }
+
+    // Create the post in the database
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        slug: finalSlug,
+        content,
+        published: published || false, // Default to false if not provided
+        authorId,
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Post created successfully.", post: newPost });
+  } catch (error) {
+    console.error("Error creating post:", error);
+    if (error.code === "P2002") {
+      return res
+        .status(409)
+        .json({ error: "A post with this slug already exists." });
+    }
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the post." });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getPostBySlug,
+  createPost,
 };
