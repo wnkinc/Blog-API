@@ -20,6 +20,7 @@ app.use("/posts", postsRoutes);
 app.use("/comments", commentsRoutes);
 app.use("/users", usersRoutes);
 
+// test
 const verifyToken = require("./middleware/auth.middleware");
 app.get("/protected-route", verifyToken, (req, res) => {
   res.status(200).json({ message: "Access granted.", user: req.user });
@@ -34,9 +35,25 @@ app.use((err, req, res, next) => {
 });
 
 /**
- * -------------- SERVER ----------------
+ * -------------- Prisma ----------------
  */
+const prisma = require("./prisma");
 
+process.on("SIGTERM", async () => {
+  console.log("Shutting down...");
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("Shutting down...");
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+/**
+ * -------------- Server ----------------
+ */
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Express app - listening on port ${PORT}!`);
