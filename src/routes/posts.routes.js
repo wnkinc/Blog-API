@@ -4,13 +4,14 @@ const {
   getPostBySlug,
   createPost,
   updatePost,
+  deletePost,
 } = require("../controllers/posts.controller");
 const router = express.Router();
 
-router.get("/", getAllPosts); // Fetch all posts
-router.get("/:slug", getPostBySlug); // Fetch single post by slug
+router.get("/", getAllPosts);
+router.get("/:slug", getPostBySlug);
 router.post("/", createPost);
 router.put("/:id", updatePost);
-router.delete("/:id" /* Delete a post */);
+router.delete("/:id", deletePost);
 
 module.exports = router;

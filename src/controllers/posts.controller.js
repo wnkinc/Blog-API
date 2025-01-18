@@ -2,7 +2,9 @@
 const prisma = require("../prisma");
 const slugify = require("slugify");
 
-// Fetch all posts with pagination
+/**
+ * -------------- GET posts ----------------
+ */
 const getAllPosts = async (req, res) => {
   try {
     // Get pagination parameters from the query string
@@ -45,7 +47,9 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-// Fetch a single post by slug
+/**
+ * -------------- GET post/:id ----------------
+ */
 const getPostBySlug = async (req, res) => {
   const { slug } = req.params;
 
@@ -80,7 +84,9 @@ const getPostBySlug = async (req, res) => {
   }
 };
 
-// Create a new post
+/**
+ * -------------- CREATE post ----------------
+ */
 const createPost = async (req, res) => {
   const { title, slug, content, published, authorId } = req.body;
 
@@ -106,13 +112,12 @@ const createPost = async (req, res) => {
       counter++;
     }
 
-    // Create the post in the database
     const newPost = await prisma.post.create({
       data: {
         title,
         slug: finalSlug,
         content,
-        published: published || false, // Default to false if not provided
+        published: published || false,
         authorId,
       },
     });
@@ -133,13 +138,14 @@ const createPost = async (req, res) => {
   }
 };
 
-// Update a post
+/**
+ * -------------- UPDATE post ----------------
+ */
 const updatePost = async (req, res) => {
   const { id } = req.params;
   const { title, slug, content, published } = req.body;
 
   try {
-    // Find the existing post
     const existingPost = await prisma.post.findUnique({
       where: { id: parseInt(id, 10) },
     });
@@ -170,7 +176,6 @@ const updatePost = async (req, res) => {
       }
     }
 
-    // Update the post
     const updatedPost = await prisma.post.update({
       where: { id: parseInt(id, 10) },
       data: {
@@ -197,9 +202,36 @@ const updatePost = async (req, res) => {
   }
 };
 
+/**
+ * -------------- DELETE post ----------------
+ */
+const deletePost = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const existingPost = await prisma.post.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!existingPost) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    await prisma.post.delete({ where: { id: parseInt(id, 10) } });
+
+    res.status(200).json({ message: "Post deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the post." });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getPostBySlug,
   createPost,
   updatePost,
+  deletePost,
 };
