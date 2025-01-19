@@ -4,10 +4,12 @@ const {
   getUserProfile,
   updateUserProfile,
   deleteUser,
+  getUserPosts,
 } = require("../controllers/users.controller");
 
 const router = express.Router();
 
+router.get("/:id/posts", getUserPosts);
 router.get("/:id", getUserProfile);
 router.put("/:id", updateUserProfile);
 router.delete("/:id", deleteUser);
