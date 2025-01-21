@@ -7,6 +7,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(
+    `Request to ${req.method} ${req.url} at ${new Date().toISOString()}`
+  );
+  next();
+});
+
 /**
  * -------------- ROUTES ----------------
  */

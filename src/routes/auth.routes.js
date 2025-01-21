@@ -1,13 +1,15 @@
-// routes/auth.routes.js
 const express = require("express");
-const { signup, login, logout } = require("../controllers/auth.controller");
+const {
+  handleCallback,
+  logout,
+  refreshToken,
+} = require("../controllers/auth.controller");
 
 const router = express.Router();
 
-router.post("/login", login);
-
-router.post("/signup", signup);
-
-router.post("/logout", logout);
+// Routes
+router.get("/callback", handleCallback); // Handle Cognito Hosted UI callback
+// router.post("/logout", logout); // Logout from Cognito
+// router.post("/refresh-token", refreshToken); // Refresh access token using the refresh token
 
 module.exports = router;
