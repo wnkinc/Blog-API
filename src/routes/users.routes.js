@@ -12,9 +12,9 @@ const { verifyToken } = require("../middleware/auth.middleware");
 const router = express.Router();
 
 router.post("/", verifyToken, createUser);
+router.get("/:id", getUserProfile);
 
 router.get("/:id/posts", getUserPosts);
-router.get("/:id", getUserProfile);
 router.put("/:id", updateUserProfile);
 router.delete("/:id", deleteUser);
 
