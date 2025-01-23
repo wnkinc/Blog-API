@@ -29,10 +29,10 @@ app.use("/comments", commentsRoutes);
 app.use("/users", usersRoutes);
 
 // test
-const verifyToken = require("./middleware/auth.middleware");
-app.get("/protected-route", verifyToken, (req, res) => {
-  res.status(200).json({ message: "Access granted.", user: req.user });
-});
+// const verifyToken = require("./middleware/auth.middleware");
+// app.get("/protected-route", verifyToken, (req, res) => {
+//   res.status(200).json({ message: "Access granted.", user: req.user });
+// });
 
 /**
  * -------------- Error handling middleware ----------------
