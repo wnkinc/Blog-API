@@ -2,6 +2,39 @@
 const prisma = require("../prisma");
 
 /**
+ * -------------- Create New User ----------------
+ */
+async function createUser(req, res) {
+  try {
+    const { sub, email, username } = req.body;
+
+    // Validate required fields
+    if (!sub || !email || !username) {
+      return res
+        .status(400)
+        .json({ error: "Missing required user information." });
+    }
+
+    // Create a new user
+    const user = await prisma.user.create({
+      data: {
+        cognitoId: sub, // Use 'sub' as 'cognitoId'
+        email,
+        username,
+      },
+    });
+
+    console.log("User created:", user);
+    return res
+      .status(201)
+      .json({ message: "User created successfully.", user });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+}
+
+/**
  * -------------- GET user posts ----------------
  */
 const getUserPosts = async (req, res) => {
@@ -124,6 +157,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+  createUser,
   getUserProfile,
   updateUserProfile,
   deleteUser,
