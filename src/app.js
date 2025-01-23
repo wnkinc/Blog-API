@@ -64,5 +64,5 @@ process.on("SIGINT", async () => {
  */
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Express app - listening on port ${PORT}!`);
+  console.log(`Blog-API - listening on port ${PORT}!`);
 });

@@ -2,7 +2,7 @@
 const prisma = require("../prisma");
 
 /**
- * -------------- Create New User ----------------
+ * -------------- Check_If_Exists/Create User ----------------
  */
 async function createUser(req, res) {
   try {
@@ -13,6 +13,18 @@ async function createUser(req, res) {
       return res
         .status(400)
         .json({ error: "Missing required user information." });
+    }
+
+    // Check if the user already exists in the database using cognitoId
+    const existingUser = await prisma.user.findUnique({
+      where: { cognitoId: sub }, // Use cognitoId to check for existence
+    });
+
+    if (existingUser) {
+      console.log("User already exists:", existingUser);
+      return res
+        .status(200) // Returning 200 because the operation is not an error
+        .json({ message: "User already exists.", user: existingUser });
     }
 
     // Create a new user
