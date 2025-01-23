@@ -7,10 +7,11 @@ const {
   getUserPosts,
   createUser,
 } = require("../controllers/users.controller");
+const { verifyToken } = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
-router.post("/", createUser);
+router.post("/", verifyToken, createUser);
 
 router.get("/:id/posts", getUserPosts);
 router.get("/:id", getUserProfile);
