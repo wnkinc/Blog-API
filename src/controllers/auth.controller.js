@@ -1,69 +1,88 @@
+// controllers/auth.controller.js
 const axios = require("axios");
-const {
-  CognitoIdentityProviderClient,
-  GlobalSignOutCommand,
-} = require("@aws-sdk/client-cognito-identity-provider");
-require("dotenv").config();
-
-const cognitoClient = new CognitoIdentityProviderClient({
-  region: process.env.AWS_REGION,
-});
+const qs = require("querystring");
+const jwt = require("jsonwebtoken");
 
 /**
- * -------------- CALLBACK HANDLER ----------------
- * Exchanges the authorization code for tokens after redirect from Cognito Hosted UI.
+ * -------------- Cognito Callback ----------------
  */
-const handleCallback = async (req, res) => {
-  const { code } = req.query;
-
-  if (!code) {
-    return res.status(400).send("Authorization code is missing.");
-  }
-
+async function handleCallback(req, res) {
   try {
-    const tokenUrl = `https://${process.env.COGNITO_USER_POOL_DOMAIN}/oauth2/token`;
-    const clientId = process.env.COGNITO_APP_CLIENT_ID;
+    const { code } = req.query;
+    if (!code) {
+      return res.status(400).json({ error: "Authorization code is missing." });
+    }
 
-    // Exchange code for tokens
-    const params = new URLSearchParams();
-    params.append("grant_type", "authorization_code");
-    params.append("client_id", clientId);
-    params.append("code", code);
-    params.append("redirect_uri", process.env.COGNITO_REDIRECT_URI);
+    // Exchange authorization code for tokens
+    const tokens = await exchangeCodeForTokens(code);
 
-    const response = await axios.post(tokenUrl, params, {
+    // Decode ID token to extract user information
+    const decodedToken = jwt.decode(tokens.id_token);
+
+    // Map the fields appropriately
+    const userInfo = {
+      sub: decodedToken.sub,
+      email: decodedToken.email,
+      username: decodedToken["cognito:username"], // Map 'cognito:username' to 'username'
+    };
+
+    // Log the decoded and mapped user information
+    console.log("Mapped User Info for API:", userInfo);
+
+    // Call the API to Check/Create a user
+    const response = await axios.post("http://localhost:8080/users", userInfo, {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${tokens.access_token}`, // Pass access token for authentication if needed
       },
     });
 
-    const { id_token, access_token, refresh_token } = response.data;
+    console.log("API Response:", response.data);
 
-    // Set tokens in cookies
-    res.cookie("idToken", id_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
-    res.cookie("accessToken", access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
-    res.cookie("refreshToken", refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
+    // Set authentication cookies
+    setAuthCookies(res, tokens);
 
-    // Redirect user to the dashboard or desired page
-    res.redirect("/dashboard");
+    return res.redirect("http://localhost:4000/dashboard");
   } catch (error) {
-    console.error("Error during token exchange:", error);
-    res.status(500).send("Failed to authenticate user.");
+    console.error(
+      "Error during callback handling:",
+      error.response?.data || error.message
+    );
+    return res.status(500).json({ error: "Authentication callback failed." });
   }
-};
+}
 
-module.exports = {
-  handleCallback,
-};
+function setAuthCookies(res, tokens) {
+  const { id_token, access_token, refresh_token } = tokens;
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.APP_ENV === "production", // HTTPS only in production
+    sameSite: "none", // Adjust based on your use case
+    domain: process.env.COOKIE_DOMAIN || "localhost", // Set your domain here
+  };
+
+  res.cookie("id_token", id_token, cookieOptions);
+  res.cookie("access_token", access_token, cookieOptions);
+  res.cookie("refresh_token", refresh_token, cookieOptions);
+}
+
+async function exchangeCodeForTokens(code) {
+  const payload = {
+    grant_type: "authorization_code",
+    client_id: process.env.COGNITO_CLIENT_ID,
+    redirect_uri: process.env.COGNITO_REDIRECT_URI,
+    code,
+  };
+
+  const response = await axios.post(
+    process.env.COGNITO_TOKEN_ENDPOINT,
+    qs.stringify(payload),
+    {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    }
+  );
+
+  return response.data;
+}
+
+module.exports = { handleCallback };
