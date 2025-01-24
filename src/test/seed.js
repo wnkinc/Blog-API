@@ -10,12 +10,12 @@ const seedMockUsers = async () => {
         {
           email: "john@example.com",
           username: "JohnDoe",
-          password: "hashed_password_123", // Replace with hashed password if needed
+          cognitoId: "hashed_password_123", // Replace with hashed password if needed
         },
         {
           email: "jane@example.com",
           username: "JaneSmith",
-          password: "hashed_password_456", // Replace with hashed password if needed
+          cognitoId: "hashed_password_456", // Replace with hashed password if needed
         },
       ],
       skipDuplicates: true, // Prevent duplicates if script is run multiple times
@@ -63,7 +63,7 @@ const seedMockComments = async () => {
     const firstComment = await prisma.comment.create({
       data: {
         content: "This is the first comment on the first post.",
-        postId: 3, // Assuming the post ID exists
+        postId: 1, // Assuming the post ID exists
         userId: 1, // Assuming the user ID exists
       },
     });
@@ -72,7 +72,7 @@ const seedMockComments = async () => {
     await prisma.comment.create({
       data: {
         content: "This is a reply to the first comment.",
-        postId: 3, // Same post as the parent comment
+        postId: 1, // Same post as the parent comment
         parentId: firstComment.id, // Reference the first comment
         userId: 2, // Assuming the user ID exists
       },
@@ -82,7 +82,7 @@ const seedMockComments = async () => {
     await prisma.comment.create({
       data: {
         content: "This is another top-level comment on the second post.",
-        postId: 4, // Assuming the post ID exists
+        postId: 2, // Assuming the post ID exists
         userId: 1, // Assuming the user ID exists
       },
     });

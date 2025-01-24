@@ -28,7 +28,6 @@ async function verifyToken(req, res, next) {
   }
 
   const token = authHeader.split(" ")[1];
-  console.log("Authorization Header Token:", token);
 
   // Decode the token to inspect its claims
   const decodedToken = jwt.decode(token);
@@ -41,9 +40,6 @@ async function verifyToken(req, res, next) {
 
   // Check the type of token and validate accordingly
   if (decodedToken.token_use === "id") {
-    console.log("Token Use: ID Token");
-    console.log("ID Token Audience (aud):", decodedToken.aud);
-
     // Validate ID token
     jwt.verify(
       token,
@@ -60,15 +56,11 @@ async function verifyToken(req, res, next) {
             .json({ error: "Unauthorized: Invalid token." });
         }
 
-        console.log("Decoded JWT Token:", decoded);
         req.user = decoded; // Attach decoded user info to the request
         next(); // Proceed to the next middleware
       }
     );
   } else if (decodedToken.token_use === "access") {
-    console.log("Token Use: Access Token");
-    console.log("Access Token Client ID:", decodedToken.client_id);
-
     // Validate Access token
     jwt.verify(
       token,
@@ -94,7 +86,6 @@ async function verifyToken(req, res, next) {
             .json({ error: "Unauthorized: Invalid client_id." });
         }
 
-        console.log("Decoded JWT Token:", decoded);
         req.user = decoded; // Attach decoded user info to the request
         next(); // Proceed to the next middleware
       }

@@ -21,7 +21,6 @@ async function createUser(req, res) {
     });
 
     if (existingUser) {
-      console.log("User already exists:", existingUser);
       return res
         .status(200) // Returning 200 because the operation is not an error
         .json({ message: "User already exists.", user: existingUser });
@@ -36,7 +35,6 @@ async function createUser(req, res) {
       },
     });
 
-    console.log("User created:", user);
     return res
       .status(201)
       .json({ message: "User created successfully.", user });
