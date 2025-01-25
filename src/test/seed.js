@@ -10,12 +10,12 @@ const seedMockUsers = async () => {
         {
           email: "john@example.com",
           username: "JohnDoe",
-          cognitoId: "hashed_password_123", // Replace with hashed password if needed
+          sub: "hashed_password_123", // Replace with hashed password if needed
         },
         {
           email: "jane@example.com",
           username: "JaneSmith",
-          cognitoId: "hashed_password_456", // Replace with hashed password if needed
+          sub: "hashed_password_456", // Replace with hashed password if needed
         },
       ],
       skipDuplicates: true, // Prevent duplicates if script is run multiple times
@@ -95,8 +95,8 @@ const seedMockComments = async () => {
 };
 
 const main = async () => {
-  // await seedMockUsers();
-  // await seedMockPosts();
+  await seedMockUsers();
+  await seedMockPosts();
   await seedMockComments();
 };
 
