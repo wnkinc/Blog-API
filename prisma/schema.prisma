@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  cognitoId String    @unique // Unique Cognito ID (sub)
+  sub       String    @unique // Unique Cognito ID (sub)
   email     String    @unique // User's email
   username  String    @unique // User's username
   posts     Post[] // Relation to posts
