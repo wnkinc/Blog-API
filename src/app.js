@@ -1,27 +1,35 @@
+// app.js
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Enable CORS
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000", // Frontend URL
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  })
-);
+// Add cookie-parser middleware
+app.use(cookieParser()); // Parses cookies into req.cookies
+/**
+ * -------------- logging middleware ----------------
+ */
+// app.use((req, res, next) => {
+//   const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+//   const origin =
+//     req.headers.origin ||
+//     "No Origin (likely same-origin or server-side request)";
+//   const userAgent = req.headers["user-agent"] || "Unknown";
 
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(
-    `Request to ${req.method} ${req.url} at ${new Date().toISOString()}`
-  );
-  next();
-});
+//   console.log(
+//     `Request to ${req.method} ${fullUrl} at ${new Date().toISOString()}`
+//   );
+//   console.log("Request Origin:", origin);
+//   console.log("User-Agent:", userAgent);
+//   console.log("Headers:", req.headers);
+//   console.log("Cookies:", req.cookies);
+
+//   next();
+// });
 
 /**
  * -------------- ROUTES ----------------
@@ -36,17 +44,16 @@ app.use("/posts", postsRoutes);
 app.use("/comments", commentsRoutes);
 app.use("/users", usersRoutes);
 
-// test
-// const verifyToken = require("./middleware/auth.middleware");
-// app.get("/protected-route", verifyToken, (req, res) => {
-//   res.status(200).json({ message: "Access granted.", user: req.user });
-// });
-
 /**
  * -------------- Error handling middleware ----------------
  */
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  if (err.message === "Not allowed by CORS") {
+    console.error("CORS Error:", err.message);
+    return res.status(403).json({ error: "CORS error: Origin not allowed" });
+  }
+
+  console.error("Error:", err.stack || err.message);
   res.status(500).json({ error: "Something went wrong!" });
 });
 

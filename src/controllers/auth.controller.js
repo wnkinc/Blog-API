@@ -57,7 +57,7 @@ function setAuthCookies(res, tokens) {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.APP_ENV === "production", // HTTPS only in production
-    sameSite: "none", // Adjust based on your use case
+    sameSite: "lax", // Adjust based on your use case
     domain: process.env.COOKIE_DOMAIN || "localhost", // Set your domain here
   };
 

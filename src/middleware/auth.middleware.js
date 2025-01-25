@@ -1,9 +1,13 @@
+// middleware/verify.token.js
 const jwt = require("jsonwebtoken");
 const jwksClient = require("jwks-rsa"); // Install with `npm install jwks-rsa`
 require("dotenv").config();
 
 const client = jwksClient({
-  jwksUri: process.env.COGNITO_JWKS_URI, // JWKS URI from Cognito
+  jwksUri: process.env.COGNITO_JWKS_URI,
+  cache: true, // Enable caching
+  cacheMaxEntries: 5, // Default is 5 keys
+  cacheMaxAge: 600000, // Cache keys for 10 minutes
 });
 
 function getKey(header, callback) {
@@ -20,14 +24,23 @@ function getKey(header, callback) {
 }
 
 async function verifyToken(req, res, next) {
+  // *** ADDITION: CHECK FOR TOKEN IN COOKIES IF AUTHORIZATION HEADER IS MISSING ***
   const authHeader = req.headers.authorization;
+  let token;
+  console.log("FUCKING COOKIES:", req.cookies);
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else if (req.cookies && req.cookies.access_token) {
+    token = req.cookies.access_token; // Extract token from cookies
+    console.log("Token retrieved from cookies:", token);
+  }
+
+  if (!token) {
     console.error("Unauthorized: No token provided.");
     return res.status(401).json({ error: "Unauthorized: No token provided." });
   }
-
-  const token = authHeader.split(" ")[1];
+  //*************************************************** */
 
   // Decode the token to inspect its claims
   const decodedToken = jwt.decode(token);
