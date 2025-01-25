@@ -17,7 +17,7 @@ async function createUser(req, res) {
 
     // Check if the user already exists in the database using cognitoId
     const existingUser = await prisma.user.findUnique({
-      where: { cognitoId: sub }, // Use cognitoId to check for existence
+      where: { sub }, // Use cognitoId to check for existence
     });
 
     if (existingUser) {
@@ -29,7 +29,7 @@ async function createUser(req, res) {
     // Create a new user
     const user = await prisma.user.create({
       data: {
-        cognitoId: sub, // Use 'sub' as 'cognitoId'
+        sub, // Use 'sub' as 'cognitoId'
         email,
         username,
       },
@@ -89,11 +89,12 @@ const getUserPosts = async (req, res) => {
  * -------------- GET user profile ----------------
  */
 const getUserProfile = async (req, res) => {
-  const userId = req.params.id;
+  const userSub = req.params.sub; // Assuming the Cognito sub is passed as the ID in the request
 
   try {
+    // Fetch user using the sub field in the database
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(userId, 10) },
+      where: { sub: userSub }, // Query by sub instead of id
     });
 
     if (!user) {
@@ -102,10 +103,10 @@ const getUserProfile = async (req, res) => {
 
     res.status(200).json({ user });
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching the user profile." });
+    console.error("Error fetching user profile:", error.message);
+    res.status(500).json({
+      error: "An error occurred while fetching the user profile.",
+    });
   }
 };
 
