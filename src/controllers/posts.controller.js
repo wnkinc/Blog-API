@@ -1,6 +1,7 @@
 // controllers/posts.controller.js
 const prisma = require("../prisma");
 const slugify = require("slugify");
+const sanitizeHtml = require("sanitize-html");
 
 /**
  * -------------- GET posts ----------------
@@ -48,7 +49,7 @@ const getAllPosts = async (req, res) => {
 };
 
 /**
- * -------------- GET post/:id ----------------
+ * -------------- GET post/:slug ----------------
  */
 const getPostBySlug = async (req, res) => {
   const { slug } = req.params;
@@ -87,56 +88,78 @@ const getPostBySlug = async (req, res) => {
 /**
  * -------------- CREATE post ----------------
  */
-const createPost = async (req, res) => {
-  const { title, slug, content, published, authorId } = req.body;
-
+async function createPost(req, res) {
+  console.log("🚀 createPost route was hit!");
   try {
-    // Validate required fields
-    if (!title || !content || !authorId) {
+    const { title, content, status, sub } = req.body;
+
+    if (!title || !content || !sub) {
       return res
         .status(400)
-        .json({ error: "Title, content, and authorId are required." });
+        .json({ error: "Title, content, and sub are required." });
     }
 
-    // Generate slug if not provided
-    let finalSlug = slug || slugify(title, { lower: true, strict: true });
-
-    // Ensure slug is unique
-    let slugExists = await prisma.post.findUnique({
-      where: { slug: finalSlug },
+    // Look up the user by AWS Cognito `sub`
+    const user = await prisma.user.findUnique({
+      where: { sub },
     });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Generate a unique slug from the title
+    let slug = slugify(title, { lower: true, strict: true });
+
+    // Ensure slug is unique by appending a number if needed
+    let existingPost = await prisma.post.findUnique({ where: { slug } });
     let counter = 1;
-    while (slugExists) {
-      finalSlug = `${slugify(title, { lower: true, strict: true })}-${counter}`;
-      slugExists = await prisma.post.findUnique({ where: { slug: finalSlug } });
+    while (existingPost) {
+      slug = `${slug}-${counter}`;
+      existingPost = await prisma.post.findUnique({ where: { slug } });
       counter++;
     }
 
-    const newPost = await prisma.post.create({
-      data: {
-        title,
-        slug: finalSlug,
-        content,
-        published: published || false,
-        authorId,
+    // Sanitize content before saving
+    const cleanContent = sanitizeHtml(content, {
+      allowedTags: [
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "b",
+        "i",
+        "u",
+        "a",
+        "img",
+        "ul",
+        "li",
+        "blockquote",
+        "code",
+      ],
+      allowedAttributes: {
+        a: ["href", "target"],
+        img: ["src", "alt"],
       },
     });
 
-    res
-      .status(201)
-      .json({ message: "Post created successfully.", post: newPost });
+    // Store post in PostgreSQL using Prisma
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        slug,
+        content: cleanContent,
+        published: status === "published",
+        authorId: user.id,
+      },
+    });
+
+    res.status(201).json(newPost);
   } catch (error) {
     console.error("Error creating post:", error);
-    if (error.code === "P2002") {
-      return res
-        .status(409)
-        .json({ error: "A post with this slug already exists." });
-    }
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the post." });
+    res.status(500).json({ error: "Internal server error" });
   }
-};
+}
 
 /**
  * -------------- UPDATE post ----------------
