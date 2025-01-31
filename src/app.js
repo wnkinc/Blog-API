@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
+const path = require("path");
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -10,6 +11,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Add cookie-parser middleware
 app.use(cookieParser()); // Parses cookies into req.cookies
+
+// Serve uploaded images statically
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+
 /**
  * -------------- logging middleware ----------------
  */

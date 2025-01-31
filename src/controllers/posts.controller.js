@@ -2,6 +2,7 @@
 const prisma = require("../prisma");
 const slugify = require("slugify");
 const sanitizeHtml = require("sanitize-html");
+require("dotenv").config();
 
 /**
  * -------------- GET posts ----------------
@@ -251,10 +252,32 @@ const deletePost = async (req, res) => {
   }
 };
 
+/**
+ * -------------- UPLOAD image ----------------
+ */
+async function uploadImage(req, res) {
+  try {
+    console.log("HITTTTTTTTER");
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+
+    // Construct the URL for the uploaded image
+    const imageUrl = `${process.env.BLOG_API_BASE_URL}/uploads/${req.file.filename}`;
+
+    // Return the image URL to the frontend
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error("Image upload error:", error.message);
+    res.status(500).json({ error: "Failed to upload image." });
+  }
+}
+
 module.exports = {
   getAllPosts,
   getPostBySlug,
   createPost,
   updatePost,
   deletePost,
+  uploadImage,
 };
