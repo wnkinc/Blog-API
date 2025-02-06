@@ -2,6 +2,87 @@
 const prisma = require("../prisma");
 
 /**
+ * -------------- POST comment ----------------
+ */
+const postComment = async (req, res) => {
+  const { slug } = req.params;
+  const { content } = req.body;
+
+  try {
+    // Find the post by slug to get its ID
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    // Create a new comment (without a user)
+    const newComment = await prisma.comment.create({
+      data: {
+        content,
+        postId: post.id,
+      },
+    });
+
+    res.status(201).json({ comment: newComment });
+  } catch (error) {
+    console.error("Error posting comment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while posting the comment." });
+  }
+};
+
+/**
+ * -------------- POST reply ----------------
+ */
+const postReply = async (req, res) => {
+  const { slug } = req.params;
+  const { content, commentId } = req.body;
+
+  try {
+    // Find the post by slug to ensure it exists
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    // Find the parent comment to ensure it exists
+    const parentComment = await prisma.comment.findUnique({
+      where: { id: parseInt(commentId, 10) },
+      select: { id: true },
+    });
+
+    if (!parentComment) {
+      return res.status(404).json({ error: "Parent comment not found." });
+    }
+
+    // Create a new reply linked to the parent comment
+    const newReply = await prisma.comment.create({
+      data: {
+        content,
+        postId: post.id, // Link to the post
+        parentId: parentComment.id, // Link to the parent comment
+      },
+    });
+
+    res.status(201).json({ reply: newReply });
+  } catch (error) {
+    console.error("Error posting reply:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while posting the reply." });
+  }
+};
+
+/**
  * -------------- GET comments/:postId ----------------
  */
 const getCommentsByPostId = async (req, res) => {
@@ -58,41 +139,6 @@ const getCommentsByPostId = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while fetching comments." });
-  }
-};
-
-/**
- * -------------- POST comment ----------------
- */
-const postComment = async (req, res) => {
-  const { slug } = req.params;
-  const { content } = req.body;
-
-  try {
-    // Find the post by slug to get its ID
-    const post = await prisma.post.findUnique({
-      where: { slug },
-      select: { id: true },
-    });
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    // Create a new comment (without a user)
-    const newComment = await prisma.comment.create({
-      data: {
-        content,
-        postId: post.id,
-      },
-    });
-
-    res.status(201).json({ comment: newComment });
-  } catch (error) {
-    console.error("Error posting comment:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while posting the comment." });
   }
 };
 
@@ -162,8 +208,9 @@ const updateComment = async (req, res) => {
 };
 
 module.exports = {
-  getCommentsByPostId,
   postComment,
+  postReply,
+  getCommentsByPostId,
   deleteComment,
   updateComment,
 };
