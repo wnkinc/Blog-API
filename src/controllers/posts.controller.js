@@ -68,6 +68,13 @@ const getPostBySlug = async (req, res) => {
             user: {
               select: { id: true, username: true },
             },
+            replies: {
+              include: {
+                user: {
+                  select: { id: true, username: true },
+                },
+              },
+            },
           },
         },
       },
@@ -92,7 +99,7 @@ const getPostBySlug = async (req, res) => {
 async function createPost(req, res) {
   console.log("🚀 createPost route was hit!");
   try {
-    const { title, content, status, sub } = req.body;
+    const { title, content, status, sub, coverImage } = req.body;
 
     if (!title || !content || !sub) {
       return res
@@ -121,27 +128,11 @@ async function createPost(req, res) {
       counter++;
     }
 
-    // Sanitize content before saving
     const cleanContent = sanitizeHtml(content, {
-      allowedTags: [
-        "p",
-        "h1",
-        "h2",
-        "h3",
-        "b",
-        "i",
-        "u",
-        "a",
-        "img",
-        "ul",
-        "li",
-        "blockquote",
-        "code",
-      ],
-      allowedAttributes: {
-        a: ["href", "target"],
-        img: ["src", "alt"],
-      },
+      allowedTags: sanitizeHtml.defaults.allowedTags.filter(
+        (tag) => tag !== "script" && tag !== "style"
+      ),
+      disallowedTagsMode: "discard", // Remove disallowed tags completely
     });
 
     // Store post in PostgreSQL using Prisma
@@ -151,6 +142,7 @@ async function createPost(req, res) {
         slug,
         content: cleanContent,
         published: status === "published",
+        coverImage: coverImage || null, // Save cover image URL (if provided)
         authorId: user.id,
       },
     });
@@ -165,92 +157,12 @@ async function createPost(req, res) {
 /**
  * -------------- UPDATE post ----------------
  */
-const updatePost = async (req, res) => {
-  const { id } = req.params;
-  const { title, slug, content, published } = req.body;
-
-  try {
-    const existingPost = await prisma.post.findUnique({
-      where: { id: parseInt(id, 10) },
-    });
-
-    if (!existingPost) {
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    // Determine final slug
-    let finalSlug = slug || existingPost.slug;
-    if (title && !slug) {
-      finalSlug = slugify(title, { lower: true, strict: true });
-
-      // Ensure the slug is unique
-      let slugExists = await prisma.post.findUnique({
-        where: { slug: finalSlug },
-      });
-      let counter = 1;
-      while (slugExists) {
-        finalSlug = `${slugify(title, {
-          lower: true,
-          strict: true,
-        })}-${counter}`;
-        slugExists = await prisma.post.findUnique({
-          where: { slug: finalSlug },
-        });
-        counter++;
-      }
-    }
-
-    const updatedPost = await prisma.post.update({
-      where: { id: parseInt(id, 10) },
-      data: {
-        title: title || existingPost.title,
-        slug: finalSlug,
-        content: content || existingPost.content,
-        published: published !== undefined ? published : existingPost.published,
-      },
-    });
-
-    res
-      .status(200)
-      .json({ message: "Post updated successfully.", post: updatedPost });
-  } catch (error) {
-    console.error("Error updating post:", error);
-    if (error.code === "P2002") {
-      return res
-        .status(409)
-        .json({ error: "A post with this slug already exists." });
-    }
-    res
-      .status(500)
-      .json({ error: "An error occurred while updating the post." });
-  }
-};
+const updatePost = async (req, res) => {};
 
 /**
  * -------------- DELETE post ----------------
  */
-const deletePost = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const existingPost = await prisma.post.findUnique({
-      where: { id: parseInt(id, 10) },
-    });
-
-    if (!existingPost) {
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    await prisma.post.delete({ where: { id: parseInt(id, 10) } });
-
-    res.status(200).json({ message: "Post deleted successfully." });
-  } catch (error) {
-    console.error("Error deleting post:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while deleting the post." });
-  }
-};
+const deletePost = async (req, res) => {};
 
 /**
  * -------------- UPLOAD image ----------------

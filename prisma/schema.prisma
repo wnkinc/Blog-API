@@ -14,27 +14,29 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  sub       String    @unique // Unique Cognito ID (sub)
-  email     String    @unique // User's email
-  username  String    @unique // User's username
-  posts     Post[] // Relation to posts
-  comments  Comment[] // Relation to comments
-  createdAt DateTime  @default(now()) // Timestamp for when the user was created
-  updatedAt DateTime  @updatedAt // Timestamp for when the user was last updated
+  id         Int       @id @default(autoincrement())
+  sub        String    @unique // Unique Cognito ID (sub)
+  email      String    @unique // User's email
+  username   String    @unique // User's username
+  profilePic String? // Optional URL for profile picture
+  posts      Post[] // Relation to posts
+  comments   Comment[] // Relation to comments
+  createdAt  DateTime  @default(now()) // Timestamp for when the user was created
+  updatedAt  DateTime  @updatedAt // Timestamp for when the user was last updated
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
-  title     String
-  slug      String    @unique // SEO-friendly URL
-  content   String // Rich text content with HTML
-  published Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  authorId  Int
-  author    User      @relation(fields: [authorId], references: [id])
-  comments  Comment[]
+  id         Int       @id @default(autoincrement())
+  title      String
+  slug       String    @unique // SEO-friendly URL
+  content    String // Rich text content with HTML
+  coverImage String? // URL of the cover image (nullable)
+  published  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  authorId   Int
+  author     User      @relation(fields: [authorId], references: [id])
+  comments   Comment[]
 }
 
 model Comment {

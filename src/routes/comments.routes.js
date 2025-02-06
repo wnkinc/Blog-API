@@ -2,14 +2,14 @@
 const express = require("express");
 const {
   getCommentsByPostId,
-  addComment,
+  postComment,
   deleteComment,
   updateComment,
 } = require("../controllers/comments.controller");
 
 const router = express.Router();
 
-router.post("/", addComment);
+router.post("/:slug", postComment);
 router.get("/:postId", getCommentsByPostId);
 router.put("/:id", updateComment);
 router.delete("/:id", deleteComment);
