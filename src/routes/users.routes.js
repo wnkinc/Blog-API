@@ -1,11 +1,11 @@
 // routes/users.routes.js
 const express = require("express");
 const {
+  createUser,
   getUserProfile,
   updateUserProfile,
   deleteUser,
   getUserPosts,
-  createUser,
 } = require("../controllers/users.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 

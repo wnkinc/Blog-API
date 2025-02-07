@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   handleCallback,
+  loginGuest,
   logout,
   refreshToken,
 } = require("../controllers/auth.controller");
@@ -10,6 +11,7 @@ const router = express.Router();
 
 // Routes
 router.get("/callback", handleCallback); // Handle Cognito Hosted UI callback
+router.get("/guest", loginGuest);
 router.get("/verify-token", verifyToken, (req, res) => {
   // Respond with a success message and the user's details
   res.json({
