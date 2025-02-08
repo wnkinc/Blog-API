@@ -77,6 +77,7 @@ const getPostBySlug = async (req, res) => {
             },
           },
         },
+        reactions: true, // Fetch all reactions for the post
       },
     });
 
@@ -84,7 +85,22 @@ const getPostBySlug = async (req, res) => {
       return res.status(404).json({ error: "Post not found." });
     }
 
-    res.status(200).json({ post });
+    // Default reaction counts
+    const defaultReactions = {
+      like: 0,
+      unicorn: 0,
+      funny: 0,
+      wow: 0,
+      dislike: 0,
+    };
+
+    // Convert fetched reactions into an object with total counts
+    const reactionCounts = post.reactions.reduce((acc, reaction) => {
+      acc[reaction.type] = reaction.count;
+      return acc;
+    }, defaultReactions); // Merge with defaults
+
+    res.status(200).json({ post, reactions: reactionCounts });
   } catch (error) {
     console.error("Error fetching post by slug:", error);
     res

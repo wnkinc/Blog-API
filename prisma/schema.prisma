@@ -26,17 +26,29 @@ model User {
 }
 
 model Post {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   title      String
-  slug       String    @unique // SEO-friendly URL
+  slug       String     @unique // SEO-friendly URL
   content    String // Rich text content with HTML
   coverImage String? // URL of the cover image (nullable)
-  published  Boolean   @default(false)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  published  Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   authorId   Int
-  author     User      @relation(fields: [authorId], references: [id])
+  author     User       @relation(fields: [authorId], references: [id])
   comments   Comment[]
+  reactions  Reaction[]
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  type      String // Type of reaction (❤️, 🦄, 😂, 🤯, 👎)
+  count     Int      @default(0) // Total number of times this reaction was used
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, type]) // Ensures one row per reaction type per post
 }
 
 model Comment {
