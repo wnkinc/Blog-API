@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getAllPosts,
   getPostBySlug,
+  postReactions,
   createPost,
   uploadImage,
 } = require("../controllers/posts.controller");
@@ -12,6 +13,8 @@ const router = express.Router();
 
 router.get("/", getAllPosts);
 router.get("/:slug", getPostBySlug);
+router.post("/reactions", postReactions);
+
 router.post("/", verifyToken, createPost);
 router.post("/upload", verifyToken, upload.single("image"), uploadImage);
 

@@ -9,39 +9,24 @@ require("dotenv").config();
  */
 const getAllPosts = async (req, res) => {
   try {
-    // Get pagination parameters from the query string
-    const page = parseInt(req.query.page, 10) || 1; // Default to page 1
-    const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default to 10 posts per page
-
-    // Calculate the number of posts to skip
-    const skip = (page - 1) * pageSize;
-
-    // Fetch posts with pagination
+    // Fetch all posts with their reactions
     const posts = await prisma.post.findMany({
-      skip,
-      take: pageSize,
       include: {
-        author: {
-          select: { id: true, username: true },
-        },
+        author: { select: { id: true, username: true } },
         comments: true,
+        reactions: { select: { type: true, count: true } }, // Fetch each reaction per post
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
-    // Count total posts for pagination metadata
-    const totalPosts = await prisma.post.count();
+    // Aggregate total reactions count across all posts (ignoring type)
+    const totalReactions = await prisma.reaction.aggregate({
+      _sum: { count: true },
+    });
 
     res.status(200).json({
       posts,
-      meta: {
-        totalPosts,
-        currentPage: page,
-        pageSize,
-        totalPages: Math.ceil(totalPosts / pageSize),
-      },
+      totalReactions: totalReactions._sum.count || 0, // Ensure it's 0 if no reactions exist
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -171,6 +156,30 @@ async function createPost(req, res) {
 }
 
 /**
+ * -------------- POST reactions BACKEND ----------------
+ */
+const postReactions = async (req, res) => {
+  try {
+    const { allSelections } = req.body;
+    // allSelections could be { "123": ["like","funny"], "456":["wow"] }
+    for (const pid in allSelections) {
+      const types = allSelections[pid];
+      for (const type of types) {
+        await prisma.reaction.upsert({
+          where: { postId_type: { postId: parseInt(pid), type } },
+          update: { count: { increment: 1 } },
+          create: { postId: parseInt(pid), type, count: 1 },
+        });
+      }
+    }
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error in postReactions:", error);
+    res.status(500).json({ error: "DB update error" });
+  }
+};
+
+/**
  * -------------- UPDATE post ----------------
  */
 const updatePost = async (req, res) => {};
@@ -205,6 +214,7 @@ module.exports = {
   getAllPosts,
   getPostBySlug,
   createPost,
+  postReactions,
   updatePost,
   deletePost,
   uploadImage,
