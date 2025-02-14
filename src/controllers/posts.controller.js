@@ -130,10 +130,16 @@ async function createPost(req, res) {
     }
 
     const cleanContent = sanitizeHtml(content, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.filter(
-        (tag) => tag !== "script" && tag !== "style"
-      ),
-      disallowedTagsMode: "discard", // Remove disallowed tags completely
+      allowedTags: [
+        ...sanitizeHtml.defaults.allowedTags,
+        "img", // explicitly add 'img'
+      ],
+      allowedAttributes: {
+        // merge default allowed attributes with our custom ones
+        ...sanitizeHtml.defaults.allowedAttributes,
+        img: ["src", "alt", "width", "height"],
+      },
+      disallowedTagsMode: "discard",
     });
 
     // Store post in PostgreSQL using Prisma
