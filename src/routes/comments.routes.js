@@ -4,6 +4,7 @@ const {
   postComment,
   postReply,
   postCommentUser,
+  postReplyUser,
 } = require("../controllers/comments.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 
@@ -13,6 +14,6 @@ router.post("/:slug", postComment);
 router.post("/:slug/reply", postReply);
 
 router.post("/:slug/user", verifyToken, postCommentUser);
-router.post("/:slug/reply/user", verifyToken, postReply);
+router.post("/:slug/reply/user", verifyToken, postReplyUser);
 
 module.exports = router;

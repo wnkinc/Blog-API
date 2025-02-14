@@ -140,8 +140,77 @@ const postCommentUser = async (req, res) => {
   }
 };
 
+/**
+ * -------------- POST reply for user ----------------
+ */
+const postReplyUser = async (req, res) => {
+  const { slug } = req.params;
+  const { content, commentId, idToken } = req.body;
+
+  try {
+    // Decode the ID Token to get the Cognito `sub`
+    let sub = null;
+    if (idToken) {
+      const decoded = jwt.decode(idToken);
+      sub = decoded?.sub;
+    }
+
+    if (!sub) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: Missing or invalid ID Token." });
+    }
+
+    // Find user by Cognito sub
+    const user = await prisma.user.findUnique({
+      where: { sub },
+      select: { id: true }, // Fetch user ID only
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Find the post by slug to get postId
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      select: { id: true }, // Fetch post ID only
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    // Find the parent comment
+    const parentComment = await prisma.comment.findUnique({
+      where: { id: parseInt(commentId) },
+      select: { id: true }, // Fetch comment ID only
+    });
+
+    if (!parentComment) {
+      return res.status(404).json({ error: "Parent comment not found." });
+    }
+
+    // Create the reply in the database
+    const newReply = await prisma.comment.create({
+      data: {
+        content,
+        userId: user.id, // Assign correct user ID
+        postId: post.id, // Assign correct post ID
+        parentId: parentComment.id, // Set parent comment ID
+      },
+    });
+
+    res.json(newReply);
+  } catch (error) {
+    console.error("Error saving reply:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   postComment,
   postReply,
   postCommentUser,
+  postReplyUser,
 };
