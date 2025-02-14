@@ -1,5 +1,6 @@
 // controllers/comments.controller.js
 const prisma = require("../prisma");
+const jwt = require("jsonwebtoken");
 
 /**
  * -------------- POST comment ----------------
@@ -83,134 +84,64 @@ const postReply = async (req, res) => {
 };
 
 /**
- * -------------- GET comments/:postId ----------------
+ * -------------- POST comment for user ----------------
  */
-const getCommentsByPostId = async (req, res) => {
-  const { postId } = req.params;
-  const page = parseInt(req.query.page, 10) || 1; // Default to page 1
-  const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default to 10 comments per page
+const postCommentUser = async (req, res) => {
+  const { slug } = req.params;
+  const { content, idToken } = req.body;
 
   try {
-    if (!postId) {
-      return res.status(400).json({ error: "Post ID is required." });
+    // Decode the ID Token to get the Cognito sub (unique user identifier)
+    let sub = null;
+    if (idToken) {
+      const decoded = jwt.decode(idToken);
+      sub = decoded?.sub;
     }
 
-    // Calculate the number of comments to skip
-    const skip = (page - 1) * pageSize;
+    if (!sub) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: Missing or invalid ID Token." });
+    }
 
-    // Fetch comments for the specified post with pagination
-    const comments = await prisma.comment.findMany({
-      where: { postId: parseInt(postId, 10), parentId: null }, // Only fetch top-level comments
-      skip,
-      take: pageSize,
-      include: {
-        user: {
-          select: { id: true, username: true },
-        },
-        replies: {
-          include: {
-            user: {
-              select: { id: true, username: true },
-            },
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "asc", // Order by creation time
-      },
+    // Find user by Cognito sub
+    const user = await prisma.user.findUnique({
+      where: { sub },
+      select: { id: true }, // Only fetch the user ID
     });
 
-    // Count total top-level comments for pagination metadata
-    const totalComments = await prisma.comment.count({
-      where: { postId: parseInt(postId, 10), parentId: null },
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Find post by slug to get postId
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      select: { id: true }, // Only fetch the post ID
     });
 
-    res.status(200).json({
-      comments,
-      meta: {
-        totalComments,
-        currentPage: page,
-        pageSize,
-        totalPages: Math.ceil(totalComments / pageSize),
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    // Create the comment with the correct userId and postId
+    const newComment = await prisma.comment.create({
+      data: {
+        content,
+        userId: user.id, // Assign correct user ID
+        postId: post.id, // Assign correct post ID
       },
     });
+
+    res.json(newComment);
   } catch (error) {
-    console.error("Error fetching comments:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching comments." });
-  }
-};
-
-/**
- * -------------- DELETE comment ----------------
- */
-const deleteComment = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const existingComment = await prisma.comment.findUnique({
-      where: { id: parseInt(id, 10) },
-    });
-
-    if (!existingComment) {
-      return res.status(404).json({ error: "Comment not found." });
-    }
-
-    await prisma.comment.delete({ where: { id: parseInt(id, 10) } });
-
-    res.status(200).json({ message: "Comment deleted successfully." });
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while deleting the comment." });
-  }
-};
-
-/**
- * -------------- UPDATE comment ----------------
- */
-const updateComment = async (req, res) => {
-  const { id } = req.params;
-  const { content } = req.body;
-
-  try {
-    if (!content) {
-      return res.status(400).json({ error: "Content is required." });
-    }
-
-    // Check if the comment exists
-    const existingComment = await prisma.comment.findUnique({
-      where: { id: parseInt(id, 10) },
-    });
-
-    if (!existingComment) {
-      return res.status(404).json({ error: "Comment not found." });
-    }
-
-    // Update the comment
-    const updatedComment = await prisma.comment.update({
-      where: { id: parseInt(id, 10) },
-      data: { content },
-    });
-
-    res.status(200).json({
-      message: "Comment updated successfully.",
-      comment: updatedComment,
-    });
-  } catch (error) {
-    console.error("Error updating comment:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while updating the comment." });
+    console.error("Error saving comment:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 module.exports = {
   postComment,
   postReply,
-  getCommentsByPostId,
-  deleteComment,
-  updateComment,
+  postCommentUser,
 };
