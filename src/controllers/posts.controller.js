@@ -9,12 +9,13 @@ require("dotenv").config();
  */
 const getAllPosts = async (req, res) => {
   try {
-    // Fetch all posts with their reactions
+    // Fetch only published posts with their reactions
     const posts = await prisma.post.findMany({
+      where: { published: true },
       include: {
         author: { select: { id: true, username: true } },
         comments: true,
-        reactions: { select: { type: true, count: true } }, // Fetch each reaction per post
+        reactions: { select: { type: true, count: true } },
       },
       orderBy: { createdAt: "desc" },
     });
