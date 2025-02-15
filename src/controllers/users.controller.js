@@ -92,9 +92,18 @@ const getUserProfile = async (req, res) => {
   const userSub = req.params.sub; // Assuming the Cognito sub is passed as the ID in the request
 
   try {
-    // Fetch user using the sub field in the database
+    // Fetch user using the sub field, including posts with their author and comments
     const user = await prisma.user.findUnique({
-      where: { sub: userSub }, // Query by sub instead of id
+      where: { sub: userSub },
+      include: {
+        posts: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            author: true,
+            comments: true, // Include comments for each post
+          },
+        },
+      },
     });
 
     if (!user) {
