@@ -46,17 +46,17 @@ const getPostBySlug = async (req, res) => {
       where: { slug },
       include: {
         author: {
-          select: { id: true, username: true },
+          select: { id: true, username: true, profilePic: true },
         },
         comments: {
           include: {
             user: {
-              select: { id: true, username: true },
+              select: { id: true, username: true, profilePic: true },
             },
             replies: {
               include: {
                 user: {
-                  select: { id: true, username: true },
+                  select: { id: true, username: true, profilePic: true },
                 },
               },
             },
