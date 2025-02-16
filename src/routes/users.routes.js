@@ -4,6 +4,7 @@ const {
   createUser,
   getUserProfile,
   updateUserBio,
+  updateUserPic,
 } = require("../controllers/users.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 
@@ -12,6 +13,7 @@ const router = express.Router();
 router.post("/", verifyToken, createUser);
 router.get("/:sub", getUserProfile);
 router.post("/:sub/bio", verifyToken, updateUserBio);
+router.post("/:sub/pic", verifyToken, updateUserPic);
 
 module.exports = router;
 

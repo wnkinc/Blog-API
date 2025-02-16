@@ -115,8 +115,49 @@ const updateUserBio = async (req, res) => {
   }
 };
 
+/**
+ * -------------- UPDATE user profile picture ----------------
+ */
+const updateUserPic = async (req, res) => {
+  try {
+    const userSub = req.params.sub; // Get the Cognito sub from the request URL
+    const { profilePicUrl } = req.body; // Get the new profile picture URL
+
+    // Validate profile picture input
+    if (!profilePicUrl || typeof profilePicUrl !== "string") {
+      return res.status(400).json({ error: "Invalid profile picture URL." });
+    }
+
+    // Find the user in the database
+    const user = await prisma.user.findUnique({
+      where: { sub: userSub },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Update the user's profile picture
+    const updatedUser = await prisma.user.update({
+      where: { sub: userSub },
+      data: { profilePic: profilePicUrl },
+    });
+
+    return res
+      .status(200)
+      .json({
+        message: "Profile picture updated successfully.",
+        user: updatedUser,
+      });
+  } catch (error) {
+    console.error("Error updating user profile picture:", error.message);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 module.exports = {
   createUser,
   getUserProfile,
   updateUserBio,
+  updateUserPic,
 };
