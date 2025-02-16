@@ -3,9 +3,7 @@ const express = require("express");
 const {
   createUser,
   getUserProfile,
-  updateUserProfile,
-  deleteUser,
-  getUserPosts,
+  updateUserBio,
 } = require("../controllers/users.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 
@@ -13,10 +11,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, createUser);
 router.get("/:sub", getUserProfile);
-
-router.get("/:id/posts", getUserPosts);
-router.put("/:id", updateUserProfile);
-router.delete("/:id", deleteUser);
+router.post("/:sub/bio", verifyToken, updateUserBio);
 
 module.exports = router;
 

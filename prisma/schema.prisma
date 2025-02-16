@@ -19,6 +19,7 @@ model User {
   email      String    @unique // User's email
   username   String    @unique // User's username
   profilePic String? // Optional URL for profile picture
+  bio        String? // Optional user bio
   posts      Post[] // Relation to posts
   comments   Comment[] // Relation to comments
   createdAt  DateTime  @default(now()) // Timestamp for when the user was created
