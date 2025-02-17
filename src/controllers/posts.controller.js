@@ -193,7 +193,49 @@ const updatePost = async (req, res) => {};
 /**
  * -------------- DELETE post ----------------
  */
-const deletePost = async (req, res) => {};
+const deletePost = async (req, res) => {
+  const { id } = req.params; // Get post ID from URL params
+  const userSub = req.user.sub; // Get authenticated user's Cognito `sub`
+
+  try {
+    // Find the user ID from their Cognito `sub`
+    const user = await prisma.user.findUnique({
+      where: { sub: userSub },
+      select: { id: true }, // Fetch only the `id`
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the post to verify ownership
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(id) },
+      select: { authorId: true }, // Fetch only authorId for validation
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Ensure the authenticated user is the author
+    if (post.authorId !== user.id) {
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this post" });
+    }
+
+    // Delete the post (cascade deletes reactions & comments due to Prisma relations)
+    await prisma.post.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 /**
  * -------------- UPLOAD image ----------------
