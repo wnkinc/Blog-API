@@ -1,3 +1,4 @@
+// /routes/post.routes.js
 const express = require("express");
 const {
   getAllPosts,
@@ -19,6 +20,6 @@ router.post("/reactions", postReactions);
 router.delete("/:id/delete", verifyToken, deletePost);
 
 router.post("/", verifyToken, createPost);
-router.post("/upload", verifyToken, upload.single("image"), uploadImage);
+router.post("/upload", upload.single("image"), uploadImage);
 
 module.exports = router;

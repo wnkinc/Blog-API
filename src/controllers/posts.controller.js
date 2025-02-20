@@ -240,6 +240,7 @@ const deletePost = async (req, res) => {
 /**
  * -------------- UPLOAD image ----------------
  */
+// New code for S3
 async function uploadImage(req, res) {
   try {
     console.log("HITTTTTTTTER");
@@ -247,14 +248,14 @@ async function uploadImage(req, res) {
       return res.status(400).json({ error: "No file uploaded." });
     }
 
-    // Construct the URL for the uploaded image
-    const imageUrl = `${process.env.BLOG_API_BASE_URL}/uploads/${req.file.filename}`;
+    // `req.file.location` is provided by multer-s3
+    const imageUrl = req.file.location;
 
-    // Return the image URL to the frontend
-    res.json({ imageUrl });
+    // Return the S3 URL to the frontend
+    return res.json({ imageUrl });
   } catch (error) {
     console.error("Image upload error:", error.message);
-    res.status(500).json({ error: "Failed to upload image." });
+    return res.status(500).json({ error: "Failed to upload image." });
   }
 }
 
