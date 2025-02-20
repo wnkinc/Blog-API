@@ -24,3 +24,7 @@ custom:
   serverless-offline:
     noPrependStageInUrl: true
     httpPort: 8080
+
+package:
+  exclude:
+    - node_modules/**
