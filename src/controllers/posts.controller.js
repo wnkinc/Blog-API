@@ -2,7 +2,6 @@
 const prisma = require("../prisma");
 const slugify = require("slugify");
 const sanitizeHtml = require("sanitize-html");
-require("dotenv").config();
 
 /**
  * -------------- GET posts ----------------

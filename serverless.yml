@@ -18,13 +18,24 @@ functions:
           method: ANY
 
 plugins:
+  - serverless-esbuild
   - serverless-offline
 
 custom:
+  esbuild:
+    bundle: true # Bundle your code into a single file.
+    minify: true # Minify the output.
+    target: node18 # Target Node.js 18.
+    external: [] # Do not bundle these modules.
+    sourcemap: false # Optional: disable source maps to reduce size.
+    platform: node # Target Node environment.
+    define:
+      "require.resolve": undefined
   serverless-offline:
     noPrependStageInUrl: true
     httpPort: 8080
 
 package:
   exclude:
-    - node_modules/**
+    - test/**
+    - .env

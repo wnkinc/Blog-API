@@ -1,7 +1,6 @@
 // middleware/verify.token.js
 const jwt = require("jsonwebtoken");
 const jwksClient = require("jwks-rsa"); // Install with `npm install jwks-rsa`
-require("dotenv").config();
 
 const client = jwksClient({
   jwksUri: process.env.COGNITO_JWKS_URI,
