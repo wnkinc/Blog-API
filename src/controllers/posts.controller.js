@@ -28,6 +28,8 @@ const getAllPosts = async (req, res) => {
       totalReactions: totalReactions._sum.count || 0, // Ensure it's 0 if no reactions exist
     });
   } catch (error) {
+    console.error("Error fetching posts:", error.message);
+    console.error("Error stack:", error.stack);
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "An error occurred while fetching posts." });
   }

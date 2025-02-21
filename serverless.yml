@@ -7,9 +7,9 @@ provider:
   stage: local
   environment:
     DATABASE_URL: "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public"
-    BLOG_API_BASE_URL: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/"
+    BLOG_API_BASE_URL: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local"
     COGNITO_CLIENT_ID: "7qkfnqt9m06hugfi6093ksvar5"
-    COGNITO_REDIRECT_URI: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local//auth/callback"
+    COGNITO_REDIRECT_URI: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback"
     COGNITO_TOKEN_ENDPOINT: "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token"
     COGNITO_LOGOUT_ENDPOINT: "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout"
     APP_ENV: "development"
@@ -68,3 +68,5 @@ package:
   exclude:
     - test/**
     - .env
+  include:
+    - node_modules/.prisma/**

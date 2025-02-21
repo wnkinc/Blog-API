@@ -19,6 +19,7 @@
   "homepage": "https://github.com/wnkinc/Blog-API#readme",
   "dependencies": {
     "@prisma/client": "^6.3.0",
+    "prisma": "^6.3.0",
     "amazon-cognito-identity-js": "^6.3.12",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
@@ -38,7 +39,6 @@
     "esbuild": "^0.24.2",
     "i": "^0.3.7",
     "npm": "^11.1.0",
-    "prisma": "^6.3.0",
     "serverless-esbuild": "^1.54.6"
   }
 }

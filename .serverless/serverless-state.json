@@ -11,9 +11,9 @@
       "stage": "local",
       "environment": {
         "DATABASE_URL": "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public",
-        "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/",
+        "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local",
         "COGNITO_CLIENT_ID": "7qkfnqt9m06hugfi6093ksvar5",
-        "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local//auth/callback",
+        "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback",
         "COGNITO_TOKEN_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token",
         "COGNITO_LOGOUT_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout",
         "APP_ENV": "development",
@@ -210,7 +210,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/blog-api/local/1740091546526-2025-02-20T22:45:46.526Z/blog-api.zip"
+                "S3Key": "serverless/blog-api/local/1740120328481-2025-02-21T06:45:28.481Z/blog-api.zip"
               },
               "Handler": "src/app.handler",
               "Runtime": "nodejs18.x",
@@ -220,9 +220,9 @@
               "Environment": {
                 "Variables": {
                   "DATABASE_URL": "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public",
-                  "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/",
+                  "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local",
                   "COGNITO_CLIENT_ID": "7qkfnqt9m06hugfi6093ksvar5",
-                  "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local//auth/callback",
+                  "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback",
                   "COGNITO_TOKEN_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token",
                   "COGNITO_LOGOUT_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout",
                   "APP_ENV": "development",
@@ -256,14 +256,14 @@
               "AppLogGroup"
             ]
           },
-          "AppLambdaVersionq69f5DG48nxOOxXqViYFXCpeFPtNX1rF38Pn3eCm7JQ": {
+          "AppLambdaVersionZxeWzp6Ep1ibKIKK3el29mgIUwBaKjeWEhYHxzmh0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "6eYpw0Z6yMmNvgDDwk+Sv1vi8tz4K9+Yl1tpoUSwf7c="
+              "CodeSha256": "EUPhq1CjNIx0ahbJeK9z0FcAwqYa6R81/7ZVJ8mP3F8="
             }
           },
           "ApiGatewayRestApi": {
@@ -388,7 +388,7 @@
               "AppLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1740091544055": {
+          "ApiGatewayDeployment1740120325175": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -474,7 +474,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionq69f5DG48nxOOxXqViYFXCpeFPtNX1rF38Pn3eCm7JQ"
+              "Ref": "AppLambdaVersionZxeWzp6Ep1ibKIKK3el29mgIUwBaKjeWEhYHxzmh0"
             },
             "Export": {
               "Name": "sls-blog-api-local-AppLambdaFunctionQualifiedArn"
@@ -642,7 +642,7 @@
         "timeout": 6,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionq69f5DG48nxOOxXqViYFXCpeFPtNX1rF38Pn3eCm7JQ"
+        "versionLogicalId": "AppLambdaVersionZxeWzp6Ep1ibKIKK3el29mgIUwBaKjeWEhYHxzmh0"
       }
     },
     "configValidationMode": "warn",
@@ -679,6 +679,9 @@
           "test/**",
           ".env"
         ],
+        "include": [
+          "node_modules/.prisma/**"
+        ],
         "artifactsS3KeyDirname": "serverless/blog-api/local/code-artifacts"
       }
     },
@@ -688,7 +691,7 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/blog-api/local/1740091546526-2025-02-20T22:45:46.526Z",
+    "artifactDirectoryName": "serverless/blog-api/local/1740120328481-2025-02-21T06:45:28.481Z",
     "artifact": "blog-api.zip"
   }
 }
