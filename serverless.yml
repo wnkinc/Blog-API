@@ -10,12 +10,12 @@ provider:
     blockPublicAccess: true
   environment:
     DATABASE_URL: "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public"
-    BLOG_API_BASE_URL: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local"
+    BLOG_API_BASE_URL: "https://api.bywk.dev"
     COGNITO_CLIENT_ID: "7qkfnqt9m06hugfi6093ksvar5"
-    COGNITO_REDIRECT_URI: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback"
+    COGNITO_REDIRECT_URI: "https://api.bywk.dev/auth/callback"
     COGNITO_TOKEN_ENDPOINT: "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token"
     COGNITO_LOGOUT_ENDPOINT: "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout"
-    APP_ENV: "development"
+    APP_ENV: "production"
     APP_PORT: "8080"
     APP_DOMAIN: "myapp.com"
     DEBUG: "false"
@@ -28,7 +28,7 @@ provider:
     DEMO_PASSWORD: "123abcA!"
     S3_BUCKET_NAME: "blogapiimagebucket"
     S3_REGION: "us-east-1"
-    COOKIE_DOMAIN: "http://localhost:4000/dashboard"
+    COOKIE_DOMAIN: ".bywk.dev"
 
 functions:
   app:

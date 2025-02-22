@@ -12,12 +12,12 @@
       "deploymentBucket": "blogapiimagebucket",
       "environment": {
         "DATABASE_URL": "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public",
-        "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local",
+        "BLOG_API_BASE_URL": "https://api.bywk.dev",
         "COGNITO_CLIENT_ID": "7qkfnqt9m06hugfi6093ksvar5",
-        "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback",
+        "COGNITO_REDIRECT_URI": "https://api.bywk.dev/auth/callback",
         "COGNITO_TOKEN_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token",
         "COGNITO_LOGOUT_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout",
-        "APP_ENV": "development",
+        "APP_ENV": "production",
         "APP_PORT": "8080",
         "APP_DOMAIN": "myapp.com",
         "DEBUG": "false",
@@ -30,7 +30,7 @@
         "DEMO_PASSWORD": "123abcA!",
         "S3_BUCKET_NAME": "blogapiimagebucket",
         "S3_REGION": "us-east-1",
-        "COOKIE_DOMAIN": "http://localhost:4000/dashboard"
+        "COOKIE_DOMAIN": ".bywk.dev"
       },
       "versionFunctions": true,
       "deploymentBucketObject": {
@@ -143,7 +143,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "blogapiimagebucket",
-                "S3Key": "serverless/blog-api/local/1740190297860-2025-02-22T02:11:37.860Z/blog-api.zip"
+                "S3Key": "serverless/blog-api/local/1740218274399-2025-02-22T09:57:54.399Z/blog-api.zip"
               },
               "Handler": "src/app.handler",
               "Runtime": "nodejs18.x",
@@ -153,12 +153,12 @@
               "Environment": {
                 "Variables": {
                   "DATABASE_URL": "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public",
-                  "BLOG_API_BASE_URL": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local",
+                  "BLOG_API_BASE_URL": "https://api.bywk.dev",
                   "COGNITO_CLIENT_ID": "7qkfnqt9m06hugfi6093ksvar5",
-                  "COGNITO_REDIRECT_URI": "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/auth/callback",
+                  "COGNITO_REDIRECT_URI": "https://api.bywk.dev/auth/callback",
                   "COGNITO_TOKEN_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/oauth2/token",
                   "COGNITO_LOGOUT_ENDPOINT": "https://us-east-1ychprt5hz.auth.us-east-1.amazoncognito.com/logout",
-                  "APP_ENV": "development",
+                  "APP_ENV": "production",
                   "APP_PORT": "8080",
                   "APP_DOMAIN": "myapp.com",
                   "DEBUG": "false",
@@ -171,7 +171,7 @@
                   "DEMO_PASSWORD": "123abcA!",
                   "S3_BUCKET_NAME": "blogapiimagebucket",
                   "S3_REGION": "us-east-1",
-                  "COOKIE_DOMAIN": "http://localhost:4000/dashboard"
+                  "COOKIE_DOMAIN": ".bywk.dev"
                 }
               },
               "Role": {
@@ -190,14 +190,14 @@
               "AppLogGroup"
             ]
           },
-          "AppLambdaVersiona4lyalbfkqYWANt6r30NJrwrlxvKyx7fUtezSEfyO0": {
+          "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "NfN1NP8XNoWH0VjXNVC7+poHsEF8CpmYvdWA4GpI72w="
+              "CodeSha256": "I1vMNG7NoUIdDBlDKeZorS6YiQL90QosKtyV+ulj6h0="
             }
           },
           "ApiGatewayRestApi": {
@@ -322,7 +322,7 @@
               "AppLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1740190294879": {
+          "ApiGatewayDeployment1740218270968": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -406,7 +406,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersiona4lyalbfkqYWANt6r30NJrwrlxvKyx7fUtezSEfyO0"
+              "Ref": "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8"
             },
             "Export": {
               "Name": "sls-blog-api-local-AppLambdaFunctionQualifiedArn"
@@ -492,7 +492,7 @@
         "timeout": 6,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersiona4lyalbfkqYWANt6r30NJrwrlxvKyx7fUtezSEfyO0"
+        "versionLogicalId": "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8"
       }
     },
     "configValidationMode": "warn",
@@ -542,7 +542,7 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/blog-api/local/1740190297860-2025-02-22T02:11:37.860Z",
+    "artifactDirectoryName": "serverless/blog-api/local/1740218274399-2025-02-22T09:57:54.399Z",
     "artifact": "blog-api.zip"
   }
 }
