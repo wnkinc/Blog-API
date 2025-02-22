@@ -2,8 +2,10 @@
 const axios = require("axios");
 const qs = require("querystring");
 const jwt = require("jsonwebtoken");
-const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
+const AWS = require("aws-sdk");
 
+// Create an instance of CognitoIdentityServiceProvider
+const cognitoISP = new AWS.CognitoIdentityServiceProvider();
 /**
  * -------------- Cognito Callback ----------------
  */
@@ -31,11 +33,15 @@ async function handleCallback(req, res) {
     console.log("Mapped User Info for API:", userInfo);
 
     // Call the API to Check/Create a user
-    const response = await axios.post("http://localhost:8080/users", userInfo, {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`, // Pass access token for authentication if needed
-      },
-    });
+    const response = await axios.post(
+      `${process.env.BLOG_API_BASE_URL}/users`,
+      userInfo,
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`, // Pass access token for authentication if needed
+        },
+      }
+    );
 
     console.log("API Response:", response.data);
 
@@ -90,65 +96,57 @@ async function exchangeCodeForTokens(code) {
  * -------------- LOGIN guest ----------------
  */
 const loginGuest = async (req, res) => {
+  console.log("Hit loginGuest");
   try {
-    const authenticationDetails =
-      new AmazonCognitoIdentity.AuthenticationDetails({
-        Username: process.env.DEMO_USER,
-        Password: process.env.DEMO_PASSWORD,
-      });
-
-    const poolData = {
-      UserPoolId: process.env.COGNITO_USER_POOL_ID,
+    // Prepare parameters for authentication
+    const params = {
+      AuthFlow: "USER_PASSWORD_AUTH", // Use this flow for username/password
       ClientId: process.env.COGNITO_CLIENT_ID,
+      AuthParameters: {
+        USERNAME: process.env.DEMO_USER,
+        PASSWORD: process.env.DEMO_PASSWORD,
+      },
+    };
+    console.log("Calling initiateAuth with params:", params);
+    // Call Cognito to initiate authentication
+    const authResult = await cognitoISP.initiateAuth(params).promise();
+    console.log("Authentication result:", authResult);
+
+    // Extract tokens from the response
+    const tokens = {
+      id_token: authResult.AuthenticationResult.IdToken,
+      access_token: authResult.AuthenticationResult.AccessToken,
+      refresh_token: authResult.AuthenticationResult.RefreshToken,
     };
 
-    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-    const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-      Username: process.env.DEMO_USER,
-      Pool: userPool,
-    });
+    console.log("Hit loginGuest 222");
+    // Decode ID token to extract user information
+    const decodedToken = jwt.decode(tokens.id_token);
+    const userInfo = {
+      sub: decodedToken.sub,
+      email: decodedToken.email || "demo@example.com",
+      username: decodedToken["cognito:username"],
+    };
 
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: async (result) => {
-        const tokens = {
-          id_token: result.getIdToken().getJwtToken(),
-          access_token: result.getAccessToken().getJwtToken(),
-          refresh_token: result.getRefreshToken().getToken(),
-        };
+    console.log("Demo User Info:", userInfo);
 
-        // Decode ID token to extract user information
-        const decodedToken = jwt.decode(tokens.id_token);
-        const userInfo = {
-          sub: decodedToken.sub,
-          email: decodedToken.email || "demo@example.com", // Provide a default if email is not available
-          username: decodedToken["cognito:username"],
-        };
+    // Call your API to check/create a user
+    const response = await axios.post(
+      "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/users",
+      userInfo,
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      }
+    );
 
-        console.log("Demo User Info:", userInfo);
+    console.log("API Response:", response.data);
 
-        // Call API to Check/Create a user (if needed)
-        const response = await axios.post(
-          "http://localhost:8080/users",
-          userInfo,
-          {
-            headers: {
-              Authorization: `Bearer ${tokens.access_token}`,
-            },
-          }
-        );
+    // Set authentication cookies
+    setAuthCookies(res, tokens);
 
-        console.log("API Response:", response.data);
-
-        // Set authentication cookies
-        setAuthCookies(res, tokens);
-
-        return res.redirect("http://localhost:4000/dashboard");
-      },
-      onFailure: (err) => {
-        console.error("Demo login failed:", err);
-        return res.status(401).json({ error: "Demo login failed" });
-      },
-    });
+    return res.redirect("http://localhost:4000/dashboard");
   } catch (error) {
     console.error("Error during demo login:", error.message);
     return res.status(500).json({ error: "Demo login failed" });

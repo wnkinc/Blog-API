@@ -5,6 +5,9 @@ provider:
   runtime: nodejs18.x
   region: us-east-1
   stage: local
+  deploymentBucket:
+    name: blogapiimagebucket
+    blockPublicAccess: true
   environment:
     DATABASE_URL: "postgresql://postgres:B1baller1!@blogapidb.cvsse8mmqu3u.us-east-1.rds.amazonaws.com:5432/blogapidb?schema=public"
     BLOG_API_BASE_URL: "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local"
@@ -25,6 +28,7 @@ provider:
     DEMO_PASSWORD: "123abcA!"
     S3_BUCKET_NAME: "blogapiimagebucket"
     S3_REGION: "us-east-1"
+    COOKIE_DOMAIN: "http://localhost:4000/dashboard"
 
 functions:
   app:

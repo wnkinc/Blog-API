@@ -2,75 +2,6 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "The AWS CloudFormation template for this Serverless application",
   "Resources": {
-    "ServerlessDeploymentBucket": {
-      "Type": "AWS::S3::Bucket",
-      "Properties": {
-        "BucketEncryption": {
-          "ServerSideEncryptionConfiguration": [
-            {
-              "ServerSideEncryptionByDefault": {
-                "SSEAlgorithm": "AES256"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "ServerlessDeploymentBucketPolicy": {
-      "Type": "AWS::S3::BucketPolicy",
-      "Properties": {
-        "Bucket": {
-          "Ref": "ServerlessDeploymentBucket"
-        },
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": "s3:*",
-              "Effect": "Deny",
-              "Principal": "*",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":s3:::",
-                      {
-                        "Ref": "ServerlessDeploymentBucket"
-                      },
-                      "/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":s3:::",
-                      {
-                        "Ref": "ServerlessDeploymentBucket"
-                      }
-                    ]
-                  ]
-                }
-              ],
-              "Condition": {
-                "Bool": {
-                  "aws:SecureTransport": false
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
     "AppLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -159,10 +90,8 @@
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "Content": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/blog-api/local/1740091174891-2025-02-20T22:39:34.891Z/awsSdkLayer.zip"
+          "S3Bucket": "blogapiimagebucket",
+          "S3Key": "serverless/blog-api/local/1740184712509-2025-02-22T00:38:32.509Z/awsSdkLayer.zip"
         },
         "LayerName": "blog-api-aws-sdk-layer",
         "CompatibleRuntimes": [
@@ -174,10 +103,8 @@
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/blog-api/local/1740120328481-2025-02-21T06:45:28.481Z/blog-api.zip"
+          "S3Bucket": "blogapiimagebucket",
+          "S3Key": "serverless/blog-api/local/1740190297860-2025-02-22T02:11:37.860Z/blog-api.zip"
         },
         "Handler": "src/app.handler",
         "Runtime": "nodejs18.x",
@@ -204,7 +131,8 @@
             "DEMO_USER": "RandomPanda",
             "DEMO_PASSWORD": "123abcA!",
             "S3_BUCKET_NAME": "blogapiimagebucket",
-            "S3_REGION": "us-east-1"
+            "S3_REGION": "us-east-1",
+            "COOKIE_DOMAIN": "http://localhost:4000/dashboard"
           }
         },
         "Role": {
@@ -223,14 +151,14 @@
         "AppLogGroup"
       ]
     },
-    "AppLambdaVersionZxeWzp6Ep1ibKIKK3el29mgIUwBaKjeWEhYHxzmh0": {
+    "AppLambdaVersiona4lyalbfkqYWANt6r30NJrwrlxvKyx7fUtezSEfyO0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "EUPhq1CjNIx0ahbJeK9z0FcAwqYa6R81/7ZVJ8mP3F8="
+        "CodeSha256": "NfN1NP8XNoWH0VjXNVC7+poHsEF8CpmYvdWA4GpI72w="
       }
     },
     "ApiGatewayRestApi": {
@@ -355,7 +283,7 @@
         "AppLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1740120325175": {
+    "ApiGatewayDeployment1740190294879": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -408,9 +336,7 @@
   },
   "Outputs": {
     "ServerlessDeploymentBucketName": {
-      "Value": {
-        "Ref": "ServerlessDeploymentBucket"
-      },
+      "Value": "blogapiimagebucket",
       "Export": {
         "Name": "sls-blog-api-local-ServerlessDeploymentBucketName"
       }
@@ -426,14 +352,14 @@
     },
     "AwsSdkLayerLambdaLayerHash": {
       "Description": "Current Lambda layer hash",
-      "Value": "68f24c57ebaa83c1c9a235289e1447f807a62759",
+      "Value": "e6e669b63fcc15521a4904cf0b44fefc8d8775ff",
       "Export": {
         "Name": "sls-blog-api-local-AwsSdkLayerLambdaLayerHash"
       }
     },
     "AwsSdkLayerLambdaLayerS3Key": {
       "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/blog-api/local/1740091174891-2025-02-20T22:39:34.891Z/awsSdkLayer.zip",
+      "Value": "serverless/blog-api/local/1740184712509-2025-02-22T00:38:32.509Z/awsSdkLayer.zip",
       "Export": {
         "Name": "sls-blog-api-local-AwsSdkLayerLambdaLayerS3Key"
       }
@@ -441,7 +367,7 @@
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionZxeWzp6Ep1ibKIKK3el29mgIUwBaKjeWEhYHxzmh0"
+        "Ref": "AppLambdaVersiona4lyalbfkqYWANt6r30NJrwrlxvKyx7fUtezSEfyO0"
       },
       "Export": {
         "Name": "sls-blog-api-local-AppLambdaFunctionQualifiedArn"
