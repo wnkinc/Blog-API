@@ -33,17 +33,17 @@ async function handleCallback(req, res) {
     console.log("Mapped User Info for API:", userInfo);
 
     // Call the API to Check/Create a user
-    // const response = await axios.post(
-    //   `${process.env.BLOG_API_BASE_URL}/users`,
-    //   userInfo,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${tokens.access_token}`, // Pass access token for authentication if needed
-    //     },
-    //   }
-    // );
+    const response = await axios.post(
+      `${process.env.BLOG_API_BASE_URL}/users`,
+      userInfo,
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`, // Pass access token for authentication if needed
+        },
+      }
+    );
 
-    // console.log("API Response:", response.data);
+    console.log("API Response:", response.data);
 
     // Set authentication cookies
     console.log("Setting cookies with tokens:", tokens);
