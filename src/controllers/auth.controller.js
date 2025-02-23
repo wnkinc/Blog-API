@@ -134,7 +134,7 @@ const loginGuest = async (req, res) => {
 
     // Call your API to check/create a user
     const response = await axios.post(
-      "https://bt1a4zodne.execute-api.us-east-1.amazonaws.com/local/users",
+      `${process.env.BLOG_API_BASE_URL}/users`,
       userInfo,
       {
         headers: {
@@ -148,7 +148,7 @@ const loginGuest = async (req, res) => {
     // Set authentication cookies
     setAuthCookies(res, tokens);
 
-    return res.redirect("http://localhost:4000/dashboard");
+    return res.redirect("https://user.bywk.dev/dashboard");
   } catch (error) {
     console.error("Error during demo login:", error.message);
     return res.status(500).json({ error: "Demo login failed" });

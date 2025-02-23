@@ -143,7 +143,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "blogapiimagebucket",
-                "S3Key": "serverless/blog-api/local/1740218274399-2025-02-22T09:57:54.399Z/blog-api.zip"
+                "S3Key": "serverless/blog-api/local/1740283505560-2025-02-23T04:05:05.560Z/blog-api.zip"
               },
               "Handler": "src/app.handler",
               "Runtime": "nodejs18.x",
@@ -190,14 +190,14 @@
               "AppLogGroup"
             ]
           },
-          "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8": {
+          "AppLambdaVersionorhAFt121iKaXJebFpLs4WVQA95vNG7TFUVbdsBTO8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "I1vMNG7NoUIdDBlDKeZorS6YiQL90QosKtyV+ulj6h0="
+              "CodeSha256": "9tezUz4KUw9HzTiNSvdkok/W1sLtpTy0GG5aFhlS3lw="
             }
           },
           "ApiGatewayRestApi": {
@@ -322,7 +322,7 @@
               "AppLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1740218270968": {
+          "ApiGatewayDeployment1740283502654": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -406,7 +406,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8"
+              "Ref": "AppLambdaVersionorhAFt121iKaXJebFpLs4WVQA95vNG7TFUVbdsBTO8"
             },
             "Export": {
               "Name": "sls-blog-api-local-AppLambdaFunctionQualifiedArn"
@@ -492,7 +492,7 @@
         "timeout": 6,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionuHdyQdsjuNd75Ik6rFOp2xrIqHpBqBdVwddXAoxQi8"
+        "versionLogicalId": "AppLambdaVersionorhAFt121iKaXJebFpLs4WVQA95vNG7TFUVbdsBTO8"
       }
     },
     "configValidationMode": "warn",
@@ -542,7 +542,7 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/blog-api/local/1740218274399-2025-02-22T09:57:54.399Z",
+    "artifactDirectoryName": "serverless/blog-api/local/1740283505560-2025-02-23T04:05:05.560Z",
     "artifact": "blog-api.zip"
   }
 }
